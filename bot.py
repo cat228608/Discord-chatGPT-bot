@@ -2,12 +2,31 @@ import openai
 import discord
 from discord.ext import commands
 import os
+import requests
 import asyncio
 import gtts 
+import urllib.request
 from playsound import playsound 
 import dc_db
 
 bot = commands.Bot(command_prefix='/', intents=discord.Intents.all())
+
+headers = {
+    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Connection': 'keep-alive',
+    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    'Origin': 'https://freetts.ru',
+    'Referer': 'https://freetts.ru/',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36 OPR/48.0.2685.52',
+    'X-Requested-With': 'XMLHttpRequest',
+    'sec-ch-ua': '"Opera";v="95", "Chromium";v="109", "Not;A=Brand";v="24"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Windows"',
+}
 
 @bot.command()
 async def chat(ctx, *, message):
@@ -49,8 +68,16 @@ async def chat(ctx, *, message):
                     print(f"[LOG] - {id_server} озвучивание провалилось.")
                     await ctx.send(f'Вы должны находиться в голосовом канале, что бы озвучивание работало корректно!')
                     pass
-                obj = gtts.gTTS(text=text_respons, lang='ru', slow=False)
-                obj.save(f"{id_server}.mp3") 
+                data = {
+                    'code': '5',
+                    'pitch': '0',
+                    'rate': '0',
+                    'format': 'mp3',
+                    'text': f'{text_respons}',
+                }
+                responses = requests.post('https://freetts.ru/syn.php', headers=headers, data=data)
+                site = f"https://freetts.ru/{responses.json()['file']}"
+                urllib.request.urlretrieve(site, f"{id_server}.mp3")
                 vc = await voice_channel.connect()
                 vc.play(discord.FFmpegPCMAudio(f'{id_server}.mp3'))
                 while True:
@@ -65,7 +92,6 @@ async def chat(ctx, *, message):
             if get_status_tts == 'error':
                 await ctx.send(f'Ошибка получения статуса tts!')
                 break
-            break
             
         except Exception as er:
             print(f"[ERROR] - {id_server} вызвана ошибка: {er}")
@@ -129,4 +155,4 @@ async def token(ctx, *, message):
     else:
         await ctx.send("Токен не может быть пустой!")
 
-bot.run('') #Тут вас токен
+bot.run('Тут токен')
