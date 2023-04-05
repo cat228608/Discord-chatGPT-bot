@@ -30,7 +30,6 @@ headers = {
 
 @bot.command()
 async def chat(ctx, *, message):
-    # Check if the message is coming from a server
     if ctx.guild is None:
         await ctx.send("Бот предназначен для использования только на серверах!")
         return
@@ -121,7 +120,7 @@ async def set_tts(ctx, *, message):
                 await ctx.send("Озвучивание текста уже было активно!")
             if message == 'off':
                 await ctx.send("Озвучивание текста уже было отключено!")
-        elif result == 'good':
+        elif result == 'good': #Аня ты лучик солнышка в моем мире)
             if message == 'on':
                 await ctx.send("Озвучивание текста было успешно включено!")
             if message == 'off':

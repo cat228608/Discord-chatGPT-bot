@@ -15,7 +15,7 @@ def get_key(id_server):
     if row == None:
         return 'no key'
     else:
-        return row
+        return row #Обожаю тебя Анечка)
         
 def del_key(invalid_key):
     cursor.execute(f"DELETE FROM token WHERE token = '{invalid_key}'")
